@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Micros Montero-Santa Cruz | Pasajero</title>
+
+  <!-- Leaflet CSS — estilos del mapa -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Estilos básicos temporales (el diseño visual va en la Fase 2) -->
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; display: flex; height: 100vh; overflow: hidden; }
+
+    /* Panel lateral izquierdo con la lista de rutas */
+    #panel-rutas {
+      width: 320px;
+      padding: 16px;
+      overflow-y: auto;
+      background: #f5f5f5;
+      border-right: 1px solid #ddd;
+    }
+
+    /* El mapa ocupa el resto del espacio */
+    #mapa-pasajero { flex: 1; height: 100vh; }
+
+    .notificacion {
+      position: fixed; top: 16px; right: 16px;
+      padding: 12px 16px; border-radius: 8px;
+      z-index: 9999; max-width: 320px;
+      display: none;
+    }
+    .notificacion-success { background: #d4edda; color: #155724; }
+    .notificacion-error   { background: #f8d7da; color: #721c24; }
+    .notificacion-info    { background: #d1ecf1; color: #0c5460; }
+    .notificacion-warning { background: #fff3cd; color: #856404; }
+  </style>
+</head>
+<body>
+
+  <!-- Panel lateral: lista de rutas activas -->
+  <div id="panel-rutas">
+    <h2>Micros activos</h2>
+    <p style="font-size:12px; color:#666; margin: 8px 0 16px;">
+      Hacé click en "Anunciarme" y luego tocá el mapa donde estás esperando.
+    </p>
+    <div id="lista-rutas">Cargando rutas...</div>
+  </div>
+
+  <!-- Mapa principal -->
+  <div id="mapa-pasajero"></div>
+
+  <!-- Notificación flotante -->
+  <div id="notificacion" class="notificacion"></div>
+
+  <!-- Leaflet JS — debe cargarse ANTES de nuestro código -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Socket.io cliente -->
+  <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+
+  <!-- Configuración de entorno (la URL del backend) -->
+  <script>
+    // En producción, reemplazá esta URL con la de tu backend en Render
+    window.ENV_BACKEND_URL = 'http://localhost:3001';
+  </script>
+
+  <!-- Nuestro código -->
+  <script type="module" src="../src/pages/pasajero.js"></script>
+
+</body>
+</html>

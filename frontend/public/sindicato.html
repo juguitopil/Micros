@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Sindicato | Micros Montero-Santa Cruz</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; }
+
+    /* Secciones alternantes: formulario inicial vs panel activo */
+    #seccion-formulario,
+    #seccion-ruta-activa { padding: 24px; max-width: 600px; margin: 0 auto; }
+
+    /* El mapa del chofer va abajo del panel de control */
+    #mapa-chofer { width: 100%; height: 300px; margin-top: 16px; }
+
+    .campo { margin-bottom: 16px; }
+    .campo label { display: block; font-weight: bold; margin-bottom: 4px; }
+    .campo input,
+    .campo select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; border: none; border-radius: 4px; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    #btn-iniciar { background: #007bff; color: white; }
+    #btn-salir   { background: #28a745; color: white; }
+    #btn-terminar { background: #dc3545; color: white; margin-left: 8px; }
+
+    .stat-grande { font-size: 48px; font-weight: bold; text-align: center; margin: 16px 0; }
+    .stat-label  { text-align: center; color: #666; }
+
+    .notificacion {
+      position: fixed; bottom: 24px; right: 24px;
+      padding: 12px 16px; border-radius: 8px; z-index: 9999;
+      max-width: 320px; display: none;
+    }
+    .notificacion-success { background: #d4edda; color: #155724; }
+    .notificacion-error   { background: #f8d7da; color: #721c24; }
+    .notificacion-info    { background: #d1ecf1; color: #0c5460; }
+  </style>
+</head>
+<body>
+
+  <!-- SECCIÓN 1: Formulario para iniciar ruta -->
+  <div id="seccion-formulario">
+    <h1>Panel del sindicato</h1>
+    <p style="color:#666; margin: 8px 0 24px;">Completá los datos para iniciar una ruta.</p>
+
+    <div class="campo">
+      <label for="input-nombre">Nombre del chofer</label>
+      <input type="text" id="input-nombre" placeholder="Ej: Juan Pérez">
+    </div>
+
+    <div class="campo">
+      <label for="input-telefono">Teléfono</label>
+      <input type="tel" id="input-telefono" placeholder="Ej: 70012345">
+    </div>
+
+    <div class="campo">
+      <label for="select-origen">¿Desde dónde sale?</label>
+      <select id="select-origen">
+        <option value="">Seleccioná el origen</option>
+        <option value="montero">Montero → Santa Cruz</option>
+        <option value="santa_cruz">Santa Cruz → Montero</option>
+      </select>
+    </div>
+
+    <button id="btn-iniciar" onclick="iniciarRuta()">Iniciar ruta</button>
+  </div>
+
+  <!-- SECCIÓN 2: Panel activo (oculto hasta que se inicia la ruta) -->
+  <div id="seccion-ruta-activa">
+    <h2 id="info-origen-destino">—</h2>
+
+    <p>Estado: <strong id="info-estado">—</strong></p>
+    <p>Mínimo requerido: <strong id="info-minimo">—</strong> pasajeros</p>
+
+    <!-- Contador grande de pasajeros -->
+    <div class="stat-grande" id="contador-pasajeros">0</div>
+    <div class="stat-label">pasajeros anunciados</div>
+    <p style="text-align:center; margin: 8px 0;" id="texto-faltan">—</p>
+
+    <!-- Botones de acción -->
+    <div style="display: flex; justify-content: center; margin-top: 24px;">
+      <button id="btn-salir" onclick="salirConMicro()" disabled> Salir</button>
+      <button id="btn-terminar" onclick="terminarRuta()"> Terminar ruta</button>
+    </div>
+
+    <!-- Mapa con los puntos de espera de los pasajeros -->
+    <div id="mapa-chofer"></div>
+  </div>
+
+  <!-- Notificación flotante -->
+  <div id="notificacion-sindicato" class="notificacion"></div>
+
+  <!-- Dependencias externas -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+
+  <script>
+    window.ENV_BACKEND_URL = 'http://localhost:3001';
+    // Importamos las reglas de negocio para mostrar el mínimo en la UI
+    // (la validación real es en el backend — esto es solo informativo)
+    window.MINIMO_PASAJEROS_MONTERO = 15;
+    window.MINIMO_PASAJEROS_SANTA_CRUZ = 10;
+  </script>
+
+  <script type="module" src="../src/pages/sindicato.js"></script>
+
+</body>
+</html>

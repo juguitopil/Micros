@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "ui-ux-pro-max": {
+      "source": "pixel-process-ug/superkit-agents",
+      "sourceType": "github",
+      "skillPath": "templates/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "edb95a23d48c890da63aed03e51d4730ebb79942f275fb953fae18401be84271"
+    }
+  }
+}
