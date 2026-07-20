@@ -63,7 +63,7 @@
   <!-- Configuración de entorno (la URL del backend) -->
   <script>
     // En producción, reemplazá esta URL con la de tu backend en Render
-    window.ENV_BACKEND_URL = 'http://localhost:3001';
+    window.ENV_BACKEND_URL = window.ENV_BACKEND_URL || 'http://localhost:3001';
   </script>
 
   <!-- Nuestro código -->

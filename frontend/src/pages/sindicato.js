@@ -16,7 +16,7 @@ import {
   emitirRutaTerminada,
   limpiarListener,
 } from '../utils/socket.js';
-import { MINIMO_PASAJEROS_MONTERO, MINIMO_PASAJEROS_SANTA_CRUZ } from '../../config/reglas.js';
+import { MINIMO_PASAJEROS_MONTERO, MINIMO_PASAJEROS_SANTA_CRUZ } from '../config/reglas.js';
 // Nota: en el frontend las reglas de negocio se importan solo para MOSTRAR información
 // (ej: "faltan 3 pasajeros para salir"). La VALIDACIÓN real siempre ocurre en el backend.
 // Nunca confiés en validaciones solo del lado cliente — se pueden bypassear fácilmente.

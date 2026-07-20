@@ -101,7 +101,7 @@
   <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
 
   <script>
-    window.ENV_BACKEND_URL = 'http://localhost:3001';
+    window.ENV_BACKEND_URL = window.ENV_BACKEND_URL || 'http://localhost:3001';
     // Importamos las reglas de negocio para mostrar el mínimo en la UI
     // (la validación real es en el backend — esto es solo informativo)
     window.MINIMO_PASAJEROS_MONTERO = 15;
