@@ -9,6 +9,7 @@
 // JavaScript vanilla + Leaflet es suficiente para el MVP.
 
 import { rutasApi, pasajerosApi } from '../utils/api.js';
+import { ORIGEN_COORDS } from '/frontend/src/config/reglas.js';
 import {
   unirseARuta,
   onPosicionActualizada,
@@ -83,6 +84,13 @@ const cargarRutasActivas = async () => {
       // Agregar marcador del micro en el mapa (si tiene posición GPS)
       if (ruta.lat_actual && ruta.lng_actual) {
         agregarMarcadorMicro(ruta);
+      }
+
+      // Dibujar la trayectoria de la ruta
+      const origenCoord = ORIGEN_COORDS[ruta.origen];
+      const destinoCoord = ORIGEN_COORDS[ruta.destino];
+      if (origenCoord && destinoCoord) {
+        L.polyline([origenCoord, destinoCoord], { color: '#007bff', weight: 3, opacity: 0.6 }).addTo(estado.mapa);
       }
 
       // Agregar la ruta a la lista en el panel lateral

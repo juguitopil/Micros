@@ -13,6 +13,7 @@
 //   Micro termina       → servidor emite 'ruta_finalizada' → pasajeros reciben aviso
 
 const db = require('../db/queries');
+const store = require('../store');
 
 /**
  * Esta función recibe el objeto `io` de Socket.io
@@ -86,8 +87,18 @@ const inicializarSocket = (io) => {
       const { ruta_id } = datos;
 
       try {
-        // Contamos el total actualizado para enviarlo junto al evento
-        const total = await db.contarPasajeros(ruta_id);
+        // Intentamos usar la capa de DB si está disponible, si no usamos el store en memoria
+        let total;
+        try {
+          if (db && db.contarPasajeros) {
+            total = await db.contarPasajeros(ruta_id);
+          } else {
+            total = store.contarTotalPasajeros(ruta_id);
+          }
+        } catch (innerErr) {
+          // Fallback al store en memoria
+          total = store.contarTotalPasajeros(ruta_id);
+        }
 
         // Notificamos a todos en la sala (incluyendo al chofer)
         io.to(`ruta_${ruta_id}`).emit('nuevo_pasajero', {

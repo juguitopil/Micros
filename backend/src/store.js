@@ -21,7 +21,7 @@ const nuevoId = () => seq++;
 
 // ── RUTAS ──────────────────────────────────────────────────
 
-const crearRuta = (nombre, telefono, origen) => {
+const crearRuta = (nombre, telefono, origen, inicial = 0) => {
   const ruta = {
     id:       nuevoId(),
     chofer:   { nombre, telefono },              // sin tabla separada — no vale la pena para la demo
@@ -30,6 +30,7 @@ const crearRuta = (nombre, telefono, origen) => {
     estado:   'esperando',                       // 'esperando' | 'en_camino' | 'finalizada'
     lat:      null,
     lng:      null,
+    inicial_pasajeros: inicial || 0,
     creadaEn: new Date().toISOString(),
   };
   store.rutas.push(ruta);
@@ -38,10 +39,14 @@ const crearRuta = (nombre, telefono, origen) => {
 
 const obtenerRutasActivas = () =>
   store.rutas.filter(r => r.estado === 'esperando' || r.estado === 'en_camino')
-    .map(r => ({
-      ...r,
-      totalPasajeros: store.pasajeros.filter(p => p.rutaId === r.id).length,
-    }));
+    .map(r => {
+      const anunciados = store.pasajeros.filter(p => p.rutaId === r.id).length;
+      const total = (r.inicial_pasajeros || 0) + anunciados;
+      return {
+        ...r,
+        total_pasajeros: total,
+      };
+    });
 
 const buscarRuta = (id) => store.rutas.find(r => r.id === id);
 
@@ -74,6 +79,12 @@ const anunciarPasajero = (rutaId, lat, lng) => {
 const contarPasajeros = (rutaId) =>
   store.pasajeros.filter(p => p.rutaId === rutaId).length;
 
+const contarTotalPasajeros = (rutaId) => {
+  const ruta = buscarRuta(rutaId);
+  if (!ruta) return 0;
+  return (ruta.inicial_pasajeros || 0) + contarPasajeros(rutaId);
+};
+
 const obtenerPasajerosDeLaRuta = (rutaId) =>
   store.pasajeros.filter(p => p.rutaId === rutaId);
 
@@ -86,5 +97,6 @@ module.exports = {
   actualizarPosicion,
   anunciarPasajero,
   contarPasajeros,
+  contarTotalPasajeros,
   obtenerPasajerosDeLaRuta,
 };

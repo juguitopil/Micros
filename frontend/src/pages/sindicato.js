@@ -16,7 +16,7 @@ import {
   emitirRutaTerminada,
   limpiarListener,
 } from '../utils/socket.js';
-import { MINIMO_PASAJEROS_MONTERO, MINIMO_PASAJEROS_SANTA_CRUZ } from '/frontend/src/config/reglas.js';
+import { MINIMO_PASAJEROS_MONTERO, MINIMO_PASAJEROS_SANTA_CRUZ, ORIGEN_COORDS } from '/frontend/src/config/reglas.js';
 // Nota: en el frontend las reglas de negocio se importan solo para MOSTRAR información
 // (ej: "faltan 3 pasajeros para salir"). La VALIDACIÓN real siempre ocurre en el backend.
 // Nunca confiés en validaciones solo del lado cliente — se pueden bypassear fácilmente.
@@ -45,6 +45,7 @@ window.iniciarRuta = async () => {
   const nombre   = document.getElementById('input-nombre').value.trim();
   const telefono = document.getElementById('input-telefono').value.trim();
   const origen   = document.getElementById('select-origen').value;
+  const inicial  = parseInt(document.getElementById('input-inicial').value || '0', 10);
 
   // Validación básica en el cliente (el backend también valida, esto es solo UX)
   if (!nombre || !telefono || !origen) {
@@ -58,7 +59,7 @@ window.iniciarRuta = async () => {
   btnIniciar.textContent = 'Iniciando...';
 
   try {
-    const respuesta = await rutasApi.iniciar(nombre, telefono, origen);
+    const respuesta = await rutasApi.iniciar(nombre, telefono, origen, inicial);
     estado.rutaActiva = respuesta.ruta;
 
     // Transición de pantalla: ocultamos el formulario y mostramos el panel activo
@@ -280,6 +281,18 @@ const inicializarMapaChofer = () => {
   estado.marcadorChofer = L.marker(CENTRO_TRAMO, {
     icon: L.divIcon({ html: '🚌', className: '', iconSize: [32, 32] })
   }).addTo(estado.mapa);
+
+  // Dibujar la trayectoria entre origen y destino si tenemos la ruta activa
+  if (estado.rutaActiva) {
+    const origenKey = estado.rutaActiva.origen;
+    const destinoKey = estado.rutaActiva.destino;
+    const origenCoord = ORIGEN_COORDS[origenKey];
+    const destinoCoord = ORIGEN_COORDS[destinoKey];
+    if (origenCoord && destinoCoord) {
+      const linea = L.polyline([origenCoord, destinoCoord], { color: '#007bff', weight: 4, opacity: 0.7 }).addTo(estado.mapa);
+      estado.mapa.fitBounds(linea.getBounds(), { padding: [50, 50] });
+    }
+  }
 };
 
 // ─────────────────────────────────────────────────────────────

@@ -14,7 +14,7 @@ router.get('/activas', (req, res) => {
 
 // POST /api/rutas/iniciar — el chofer crea la ruta
 router.post('/iniciar', validarIniciarRuta, (req, res) => {
-  const { nombre, telefono, origen } = req.body;
+  const { nombre, telefono, origen, inicial } = req.body;
 
   if (store.existeRutaActiva(origen)) {
     return res.status(409).json({
@@ -22,8 +22,9 @@ router.post('/iniciar', validarIniciarRuta, (req, res) => {
     });
   }
 
-  const ruta = store.crearRuta(nombre, telefono, origen);
-  res.status(201).json({ mensaje: 'Ruta iniciada', ruta: { ...ruta, totalPasajeros: 0 } });
+  const ruta = store.crearRuta(nombre, telefono, origen, parseInt(inicial) || 0);
+  const total = store.contarTotalPasajeros(ruta.id);
+  res.status(201).json({ mensaje: 'Ruta iniciada', ruta: { ...ruta, total_pasajeros: total } });
 });
 
 // POST /api/rutas/:id/salir — valida mínimo y sale
@@ -35,7 +36,7 @@ router.post('/:id/salir', (req, res) => {
     return res.status(404).json({ error: 'Ruta no encontrada' });
   }
 
-  const total   = store.contarPasajeros(rutaId);
+  const total   = store.contarTotalPasajeros(rutaId);
   const minimo  = ruta.origen === 'montero' ? MINIMO_PASAJEROS_MONTERO : MINIMO_PASAJEROS_SANTA_CRUZ;
 
   if (total < minimo) {

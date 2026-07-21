@@ -51,10 +51,10 @@ export const rutasApi = {
    * @param {string} telefono - Teléfono del chofer
    * @param {string} origen   - 'montero' o 'santa_cruz'
    */
-  iniciar: (nombre, telefono, origen) =>
+  iniciar: (nombre, telefono, origen, inicial = 0) =>
     request('/api/rutas/iniciar', {
       method: 'POST',
-      body: JSON.stringify({ nombre, telefono, origen })
+      body: JSON.stringify({ nombre, telefono, origen, inicial })
     }),
 
   /**

@@ -18,7 +18,7 @@ router.post('/anunciarse', validarCoordenadas, (req, res) => {
   if (ruta.estado === 'finalizada') return res.status(409).json({ error: 'Esta ruta ya finalizó' });
 
   const pasajero = store.anunciarPasajero(parseInt(ruta_id), lat, lng);
-  const total    = store.contarPasajeros(parseInt(ruta_id));
+  const total    = store.contarTotalPasajeros(parseInt(ruta_id));
 
   res.status(201).json({
     mensaje: '¡Te anunciaste! El chofer puede verte en el mapa.',
