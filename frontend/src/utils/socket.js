@@ -73,6 +73,14 @@ const onNuevoPasajero = (callback) => {
 };
 
 /**
+ * Escucha cuando el chofer actualiza manualmente el conteo de pasajeros.
+ * @param {Function} callback - fn({ ruta_id, total_pasajeros, timestamp })
+ */
+const onConteoPasajerosActualizado = (callback) => {
+  obtenerSocket().on('conteo_pasajeros_actualizado', callback);
+};
+
+/**
  * Escucha cuando el micro finalmente sale (cumplió el mínimo).
  * @param {Function} callback - fn({ ruta_id, mensaje, timestamp })
  */
@@ -144,6 +152,7 @@ export {
   unirseARuta,
   onPosicionActualizada,
   onNuevoPasajero,
+  onConteoPasajerosActualizado,
   onRutaEnCamino,
   onRutaFinalizada,
   emitirPosicion,

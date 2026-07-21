@@ -66,6 +66,17 @@ export const rutasApi = {
     request(`/api/rutas/${rutaId}/salir`, { method: 'POST' }),
 
   /**
+   * Actualiza manualmente el conteo de pasajeros en la parada.
+   * @param {number} rutaId
+   * @param {number} cantidad
+   */
+  actualizarPasajeros: (rutaId, cantidad) =>
+    request(`/api/rutas/${rutaId}/pasajeros`, {
+      method: 'PATCH',
+      body: JSON.stringify({ cantidad })
+    }),
+
+  /**
    * Actualiza la posición GPS del micro (llamado cada ~5 segundos).
    * @param {number} rutaId
    * @param {number} lat

@@ -52,6 +52,31 @@ router.post('/:id/salir', (req, res) => {
   res.json({ mensaje: '¡El micro salió!', ruta: rutaActualizada });
 });
 
+// PATCH /api/rutas/:id/pasajeros — actualizar el conteo manual del chofer
+router.patch('/:id/pasajeros', (req, res) => {
+  const rutaId = parseInt(req.params.id);
+  const { cantidad } = req.body;
+  const resultado = store.actualizarPasajerosIniciales(rutaId, cantidad);
+
+  if (!resultado) return res.status(404).json({ error: 'Ruta no encontrada' });
+
+  const total = store.contarTotalPasajeros(rutaId);
+  const io = req.app.locals.io;
+
+  if (io) {
+    io.to(`ruta_${rutaId}`).emit('conteo_pasajeros_actualizado', {
+      ruta_id: rutaId,
+      total_pasajeros: total,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  res.json({
+    mensaje: 'Conteo de pasajeros actualizado',
+    ruta: { ...resultado, total_pasajeros: total }
+  });
+});
+
 // PATCH /api/rutas/:id/posicion — GPS del chofer
 router.patch('/:id/posicion', validarCoordenadas, (req, res) => {
   const rutaId = parseInt(req.params.id);

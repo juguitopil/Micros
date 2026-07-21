@@ -18,6 +18,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: { origin: '*', methods: ['GET', 'POST', 'PATCH'] }
 });
+app.locals.io = io;
 
 // Middlewares
 app.use(cors());

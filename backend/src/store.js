@@ -60,6 +60,13 @@ const cambiarEstadoRuta = (id, nuevoEstado) => {
   return ruta;
 };
 
+const actualizarPasajerosIniciales = (id, cantidad) => {
+  const ruta = buscarRuta(id);
+  if (!ruta) return null;
+  ruta.inicial_pasajeros = Math.max(0, parseInt(cantidad, 10) || 0);
+  return ruta;
+};
+
 const actualizarPosicion = (id, lat, lng) => {
   const ruta = buscarRuta(id);
   if (!ruta) return null;
@@ -94,6 +101,7 @@ module.exports = {
   buscarRuta,
   existeRutaActiva,
   cambiarEstadoRuta,
+  actualizarPasajerosIniciales,
   actualizarPosicion,
   anunciarPasajero,
   contarPasajeros,

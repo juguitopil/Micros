@@ -140,6 +140,20 @@ const actualizarContadorPasajeros = (total) => {
 /**
  * El chofer toca "Salir" — el backend valida el mínimo de pasajeros.
  */
+window.actualizarPasajerosManuales = async () => {
+  if (!estado.rutaActiva) return;
+
+  const cantidad = parseInt(document.getElementById('input-actualizar-pasajeros').value || '0', 10);
+  try {
+    const respuesta = await rutasApi.actualizarPasajeros(estado.rutaActiva.id, cantidad);
+    estado.rutaActiva = respuesta.ruta;
+    actualizarInfoRuta(estado.rutaActiva);
+    mostrarNotificacion('Conteo de pasajeros actualizado.', 'success');
+  } catch (error) {
+    mostrarError(error.message);
+  }
+};
+
 window.salirConMicro = async () => {
   if (!estado.rutaActiva) return;
 

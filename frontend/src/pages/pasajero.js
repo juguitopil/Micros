@@ -14,6 +14,7 @@ import {
   unirseARuta,
   onPosicionActualizada,
   onNuevoPasajero,
+  onConteoPasajerosActualizado,
   onRutaEnCamino,
   onRutaFinalizada,
   emitirNuevoPasajero,
@@ -216,6 +217,16 @@ const configurarListenersRuta = (rutaId) => {
         estado.marcadoresPasajeros[rutaId] = [];
       }
       estado.marcadoresPasajeros[rutaId].push(marcador);
+    }
+  });
+
+  // Cuando el chofer actualiza el conteo manualmente, refrescamos el contador
+  onConteoPasajerosActualizado((datos) => {
+    if (datos.ruta_id !== rutaId) return;
+
+    const contadorEl = document.getElementById(`contador-${rutaId}`);
+    if (contadorEl) {
+      contadorEl.textContent = datos.total_pasajeros;
     }
   });
 

@@ -88,8 +88,14 @@
     <div class="stat-label">pasajeros anunciados</div>
     <p style="text-align:center; margin: 8px 0;" id="texto-faltan">—</p>
 
+    <div class="campo" style="margin-top: 16px;">
+      <label for="input-actualizar-pasajeros">Actualizar pasajeros en la parada</label>
+      <input type="number" id="input-actualizar-pasajeros" min="0" value="0" />
+    </div>
+
     <!-- Botones de acción -->
-    <div style="display: flex; justify-content: center; margin-top: 24px;">
+    <div style="display: flex; justify-content: center; margin-top: 24px; flex-wrap: wrap; gap: 8px;">
+      <button id="btn-actualizar" onclick="actualizarPasajerosManuales()">Actualizar pasajeros</button>
       <button id="btn-salir" onclick="salirConMicro()" disabled> Salir</button>
       <button id="btn-terminar" onclick="terminarRuta()"> Terminar ruta</button>
     </div>
