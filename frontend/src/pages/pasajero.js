@@ -91,7 +91,14 @@ const cargarRutasActivas = async () => {
       const origenCoord = ORIGEN_COORDS[ruta.origen];
       const destinoCoord = ORIGEN_COORDS[ruta.destino];
       if (origenCoord && destinoCoord) {
-        L.polyline([origenCoord, destinoCoord], { color: '#007bff', weight: 3, opacity: 0.6 }).addTo(estado.mapa);
+        // En lugar de dibujar solo la polyline, mostramos un thumbnail del tramo
+        // usando el servicio staticmap de OpenStreetMap como vista previa y
+        // un enlace para abrir la ruta en Google Maps.
+        const centroLat = (origenCoord[0] + destinoCoord[0]) / 2;
+        const centroLng = (origenCoord[1] + destinoCoord[1]) / 2;
+        const thumbnail = `https://staticmap.openstreetmap.de/staticmap.php?center=${centroLat},${centroLng}&zoom=10&size=300x120&markers=${origenCoord[0]},${origenCoord[1]},green1|${destinoCoord[0]},${destinoCoord[1]},red1`;
+        // Guardamos el thumbnail en la propia ruta para usarlo al renderizar la tarjeta
+        ruta._thumbnailMapa = thumbnail;
       }
 
       // Agregar la ruta a la lista en el panel lateral
@@ -117,11 +124,14 @@ const agregarMarcadorMicro = (ruta) => {
   const { id, lat_actual, lng_actual, origen, destino, estado: estadoRuta, total_pasajeros } = ruta;
 
   // Ícono personalizado para el micro — podés cambiar el emoji por una imagen PNG
+  const origenKey = (origen || '').toLowerCase();
+  const origenClass = origenKey === 'montero' ? 'montero' : 'santa_cruz';
+  const badge = origenKey === 'montero' ? 'M' : 'SC';
   const iconoMicro = L.divIcon({
-    html: `<div class="marcador-micro" title="${origen} → ${destino}">🚌</div>`,
-    className: '', // Quitamos la clase default de Leaflet
-    iconSize: [32, 32],
-    iconAnchor: [16, 16], // Punto del ícono que se pina en las coordenadas
+    html: `<div class="marcador-micro ${origenClass}" title="${origen} → ${destino}">🚌<div class="badge">${badge}</div></div>`,
+    className: '',
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
   });
 
   if (estado.marcadoresMicros[id]) {
@@ -147,9 +157,14 @@ const generarContenidoPopupMicro = (ruta) => {
   return `
     <div class="popup-micro">
       <strong>${ruta.origen} → ${ruta.destino}</strong><br>
-      Chofer: ${ruta.chofer_nombre}<br>
-      Pasajeros: ${ruta.total_pasajeros}<br>
-      Estado: ${ruta.estado === 'esperando' ? '⏳ Juntando pasajeros' : '🚌 En camino'}
+      <p>Chofer: ${ruta.chofer_nombre} <br>Tel: <a href="tel:${ruta.chofer_telefono}">${ruta.chofer_telefono}</a></p>
+      <p>Pasajeros: ${ruta.total_pasajeros}<br>
+      Estado: ${ruta.estado === 'esperando' ? '⏳ Juntando pasajeros' : '🚌 En camino'}</p>
+      ${ruta._thumbnailMapa ? `
+        <a href="https://www.google.com/maps/dir/?api=1&origin=${ORIGEN_COORDS[ruta.origen][0]},${ORIGEN_COORDS[ruta.origen][1]}&destination=${ORIGEN_COORDS[ruta.destino][0]},${ORIGEN_COORDS[ruta.destino][1]}" target="_blank">
+          <img class="thumbnail-mapa" src="${ruta._thumbnailMapa}" alt="Vista del tramo" />
+        </a>
+      ` : ''}
       ${ruta.estado === 'esperando'
         ? `<br><button onclick="window.seleccionarRuta(${ruta.id})">Anunciarme en esta ruta</button>`
         : ''
@@ -165,11 +180,19 @@ const renderizarTarjetaRuta = (ruta, contenedor) => {
   const tarjeta = document.createElement('div');
   tarjeta.id = `tarjeta-ruta-${ruta.id}`;
   tarjeta.className = 'tarjeta-ruta';
+  // Construimos mini-thumbnail y enlace a Google Maps si está disponible
+  const origenCoord = ORIGEN_COORDS[ruta.origen];
+  const destinoCoord = ORIGEN_COORDS[ruta.destino];
+  const googleLink = (origenCoord && destinoCoord)
+    ? `https://www.google.com/maps/dir/?api=1&origin=${origenCoord[0]},${origenCoord[1]}&destination=${destinoCoord[0]},${destinoCoord[1]}`
+    : '#';
+
   tarjeta.innerHTML = `
     <h3>${ruta.origen.toUpperCase()} → ${ruta.destino.toUpperCase()}</h3>
-    <p>Chofer: ${ruta.chofer_nombre} (${ruta.chofer_telefono})</p>
+    <p><strong>Chofer:</strong> ${ruta.chofer_nombre} <br><strong>Tel:</strong> <a href="tel:${ruta.chofer_telefono}">${ruta.chofer_telefono}</a></p>
     <p>Pasajeros: <span id="contador-${ruta.id}">${ruta.total_pasajeros}</span></p>
     <p>Estado: <span id="estado-${ruta.id}">${ruta.estado}</span></p>
+    ${ruta._thumbnailMapa ? `<a href="${googleLink}" target="_blank"><img class="thumbnail-mapa" src="${ruta._thumbnailMapa}" alt="Mapa tramo" /></a>` : ''}
     ${ruta.estado === 'esperando'
       ? `<button onclick="window.seleccionarRuta(${ruta.id})">📍 Anunciarme aquí</button>`
       : '<span>🚌 Ya salió</span>'
